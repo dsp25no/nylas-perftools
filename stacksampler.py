@@ -60,8 +60,14 @@ class Sampler(object):
         signal.setitimer(signal.ITIMER_VIRTUAL, self.interval)
 
     def _format_frame(self, frame):
-        return '{}({})'.format(frame.f_code.co_name,
-                               frame.f_globals.get('__name__'))
+        try:
+            class_name = frame.f_locals['self'].__class__.__name__
+        except KeyError:
+            class_name = None
+        return '{}.{}({})'.format(
+            class_name, frame.f_code.co_name,
+            frame.f_globals.get('__name__')
+        )
 
     def output_stats(self):
         if self._started is None:
